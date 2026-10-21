@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BookFlix</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700;800&display=swap');
+
+    :root {
+      --bg: #141414;
+      --card-bg: #1f1f1f;
+      --red: #e50914;
+      --red-hover: #f40612;
+      --white: #f5f5f1;
+      --muted: #b3b3b3;
+      --border: rgba(255, 255, 255, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 40px 20px;
+      position: relative;
+    }
+
+    /* 1-Second Entrance Fade Overlay */
+    .page-transition-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #141414;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1), visibility 1s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body.loaded .page-transition-overlay {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    /* Top Navigation bar */
+    .pricing-header {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+    }
+
+    .brand-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--red);
+      letter-spacing: 2px;
+      text-decoration: none;
+    }
+
+    .back-btn {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+
+    .back-btn:hover {
+      color: var(--white);
+      border-color: var(--white);
+    }
+
+    /* Main Container */
+    .pricing-container {
+      max-width: 1100px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .pricing-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(2.5rem, 5vw, 3.5rem);
+      margin-bottom: 12px;
+    }
+
+    .pricing-subtitle {
+      color: var(--muted);
+      font-size: 1.1rem;
+      margin-bottom: 50px;
+    }
+
+    /* Pricing Cards Grid */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      text-align: left;
+    }
+
+    .price-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 36px 30px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .price-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(229, 9, 20, 0.5);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .price-card.featured {
+      border-color: var(--red);
+      box-shadow: 0 8px 25px rgba(229, 9, 20, 0.2);
+    }
+
+    .badge {
+      position: absolute;
+      top: -12px;
+      right: 24px;
+      background-color: var(--red);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+    }
+
+    .plan-name {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .plan-price {
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: var(--white);
+      margin-bottom: 16px;
+    }
+
+    .plan-price span {
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--muted);
+    }
+
+    .plan-desc {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin-bottom: 30px;
+      flex-grow: 1;
+    }
+
+    .subscribe-btn {
+      background-color: var(--red);
+      color: white;
+      border: none;
+      padding: 14px;
+      font-size: 1rem;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+      width: 100%;
+    }
+
+    .subscribe-btn:hover {
+      background-color: var(--red-hover);
+    }
+
+    .subscribe-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* Popup Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-box {
+      background-color: #1a1a1a;
+      border: 1px solid rgba(229, 9, 20, 0.4);
+      border-radius: 12px;
+      padding: 40px;
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+      transform: scale(0.9);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .modal-overlay.active .modal-box {
+      transform: scale(1);
+    }
+
+    .modal-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 2.2rem;
+      color: var(--red);
+      margin-bottom: 12px;
+    }
+
+    .modal-text {
+      color: var(--muted);
+      font-size: 1.05rem;
+      margin-bottom: 24px;
+    }
+
+    .close-modal-btn {
+      background-color: var(--red);
+      color: white;
+      border: none;
+      padding: 10px 24px;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    /* Fixed Bottom-Right "Joke Lang" Button */
+    .joke-lang-fixed-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background-color: #252525;
+      color: var(--white);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+      z-index: 1001;
+      transition: all 0.25s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .joke-lang-fixed-btn:hover {
+      background-color: var(--red);
+      border-color: var(--red);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 25px rgba(229, 9, 20, 0.4);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Page Fade Transition Overlay -->
+  <div class="page-transition-overlay" id="pageTransitionOverlay"></div>
+
+  <!-- Header -->
+  <header class="pricing-header">
+    <a href="index.html" class="brand-title">BOOKFLIX</a>
+    <a href="index.html" class="back-btn">← Back</a>
+  </header>
+
+  <!-- Pricing Content -->
+  <main class="pricing-container">
+    <h1 class="pricing-title">Unlock Unlimited Reading</h1>
+    <p class="pricing-subtitle">Choose your tier and stream classic literature in cinematic style.</p>
+
+    <div class="pricing-grid">
+      <!-- $9 Tier -->
+      <div class="price-card">
+        <h3 class="plan-name">Casual Reader</h3>
+        <div class="plan-price">$9 <span>/ month</span></div>
+        <p class="plan-desc">For light readers who want standard access to our curated classic book shelves and comfortable reading tools.</p>
+        <button class="subscribe-btn" type="button">Subscribe $9</button>
+      </div>
+
+      <!-- $19 Tier -->
+      <div class="price-card featured">
+        <span class="badge">Most Popular</span>
+        <h3 class="plan-name">Cinephile Scholar</h3>
+        <div class="plan-price">$19 <span>/ year</span></div>
+        <p class="plan-desc">Unlimited access across all genres, priority server requests, custom typography themes, and ad-free immersion.</p>
+        <button class="subscribe-btn" type="button">Subscribe $19</button>
+      </div>
+
+      <!-- $99 Tier -->
+      <div class="price-card">
+        <h3 class="plan-name">Emperor of Literature</h3>
+        <div class="plan-price">$99 <span>/ lifetime</span></div>
+        <p class="plan-desc">Own the entire archive forever. Includes VIP golden badge next to your username and digital tea breaks on demand.</p>
+        <button class="subscribe-btn" type="button">Subscribe $99</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- "Just Kidding" Popup Modal -->
+  <div class="modal-overlay" id="jokeModal">
+    <div class="modal-box">
+      <h2 class="modal-title">Joke lang po!</h2>
+      <p class="modal-text">Yah, click mo lang po yung "Skip" sa Bottom Right, eto talaga mag babayad eh noh.</p>
+      <button class="close-modal-btn" id="closeModalBtn" type="button">Got it</button>
+    </div>
+  </div>
+
+  <!-- Always Visible Bottom-Right "Joke Lang" Button -->
+  <a href="main.html" class="joke-lang-fixed-btn">Skip</a>
+
+  <!-- Script for 1-Sec Fade In & Modal Handler -->
+  <script>
+    // 1-Second Fade-In on Page Load
+    document.addEventListener("DOMContentLoaded", () => {
+      setTimeout(() => {
+        document.body.classList.add("loaded");
+      }, 50);
+    });
+
+    // Modal Triggers
+    const subscribeBtns = document.querySelectorAll(".subscribe-btn");
+    const jokeModal = document.getElementById("jokeModal");
+    const closeModalBtn = document.getElementById("closeModalBtn");
+
+    subscribeBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        jokeModal.classList.add("active");
+      });
+    });
+
+    closeModalBtn.addEventListener("click", () => {
+      jokeModal.classList.remove("active");
+    });
+
+    jokeModal.addEventListener("click", (e) => {
+      if (e.target === jokeModal) {
+        jokeModal.classList.remove("active");
+      }
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#141414">
+  <title>BookFlix</title>
+  <link rel="icon" type="image/png" href="BookFlix.png">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="page-transition-overlay" id="pageTransitionOverlay"></div>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="Bookflix home">BOOKFLIX</a>
+    <nav class="main-nav" aria-label="Main navigation">
+      <a class="active" href="">Home</a>
+      <a href="#browse">Books</a>
+      <button id="myListNav" class="nav-button" type="button">My List <span id="savedCount">0</span></button>
+    </nav>
+    <div class="header-tools">
+      <label class="search-box" for="searchInput">
+        <span aria-hidden="true">⌕</span>
+        <input id="searchInput" type="search" placeholder="Search titles or authors..." autocomplete="off">
+      </label>
+    </div>
+  </header>
+
+  <div id="loadingBox" class="loading-box-overlay">
+  <div class="spinning-box"></div>
+  </div>
+
+
+  <main id="home">
+    <section class="hero" aria-labelledby="heroTitle">
+      <div class="hero-shade"></div>
+      <div class="hero-content">
+        <p class="eyebrow"><span class="tiny-mark">B</span> BOOKFLIX ORIGINAL COLLECTION</p>
+        <p class="hero-kicker">YOUR NEXT GREAT ADVENTURE STARTS HERE</p>
+        <h1 id="heroTitle">Stories worth<br><span>staying for.</span></h1>
+        <p class="hero-description">Discover timeless adventures, unforgettable characters, and classic books you can read for free.</p>
+        <div class="hero-actions">
+          <button id="heroRead" class="btn btn-light" type="button" onclick="transitionToPage('11.html')"><span>▶</span> Read Featured Book</button>
+          <button id="heroInfo" class="btn btn-muted" type="button"><span>ⓘ</span> More Info</button>
+        </div>
+        <p class="hero-note">30 CLASSIC BOOKS · FREE TO EXPLORE</p>
+      </div>
+      <div class="hero-side-label">THE CLASSICS COLLECTION</div>
+    </section>
+
+    <section class="content-area" id="browse">
+      <div class="section-heading">
+        <div>
+          <p class="section-eyebrow">THE LIBRARY</p>
+          <h2 id="sectionTitle">Explore the collection</h2>
+        </div>
+        <div class="filter-wrap">
+          <label class="sr-only" for="genreFilter">Filter by genre</label>
+          
+          <!-- Custom Animated Dropdown Component -->
+          <div class="custom-dropdown" id="genreDropdown">
+            <div class="dropdown-selected" id="genreSelected">
+              <span id="selectedGenreText">All genres</span>
+              <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+            <div class="dropdown-options" id="genreOptions">
+              <div class="dropdown-option" data-value="All">All genres</div>
+              <div class="dropdown-option" data-value="Adventure">Adventure</div>
+              <div class="dropdown-option" data-value="Fantasy">Fantasy</div>
+              <div class="dropdown-option" data-value="Romance">Romance</div>
+              <div class="dropdown-option" data-value="Mystery">Mystery</div>
+              <div class="dropdown-option" data-value="Horror">Horror</div>
+              <div class="dropdown-option" data-value="Drama">Drama</div>
+              <div class="dropdown-option" data-value="Science Fiction">Science Fiction</div>
+              <div class="dropdown-option" data-value="Classic Literature">Classic Literature</div>
+              <div class="dropdown-option" data-value="Philosophy">Philosophy</div>
+            </div>
+          </div>
+          <!-- Hidden native select for backend script compatibility if needed -->
+          <select id="genreFilter" style="display: none;">
+            <option value="All" selected>All genres</option>
+            <option value="Adventure">Adventure</option><option value="Fantasy">Fantasy</option><option value="Romance">Romance</option>
+            <option value="Mystery">Mystery</option><option value="Horror">Horror</option><option value="Drama">Drama</option>
+            <option value="Science Fiction">Science Fiction</option><option value="Classic Literature">Classic Literature</option><option value="Philosophy">Philosophy</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="searchStatus" class="search-status" aria-live="polite"></div>
+      <div id="bookRows"></div>
+
+      <section class="all-books-section" id="allBooksSection">
+        <div class="row-title-line">
+          <div><p class="section-eyebrow">THE COMPLETE SHELF</p><h2>All 30 books</h2></div>
+          <span id="bookCountLabel" class="muted-label">30 TITLES</span>
+        </div>
+        <div id="allBooksGrid" class="book-grid"></div>
+      </section>
+
+      <section id="emptyState" class="empty-state" hidden>
+        <div class="empty-icon">⌕</div><h2>No books found</h2>
+        <p>Try another title, author, or genre.</p>
+        <button id="clearSearch" class="btn btn-muted" type="button">Clear filters</button>
+      </section>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <a class="brand footer-brand" href="#">BOOKFLIX</a>
+    <p>A little place for big stories.</p>
+    <p class="footer-small">Classic texts are sourced from Project Gutenberg. Availability and public-domain status can vary by country. Check local rights before redistribution. I Do not own any of this, Credit to the Owner</p>
+  </footer>
+
+  <div id="bookModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" hidden>
+    <div class="modal-backdrop" data-close-modal></div>
+    <section class="modal-panel">
+      <button id="closeModal" class="icon-button close-button" type="button" aria-label="Close book details">✕</button>
+      <div id="modalHero" class="modal-hero">
+        <div class="modal-hero-shade"></div>
+        <div class="modal-hero-copy">
+          <p id="modalGenre" class="eyebrow"></p>
+          <h2 id="modalTitle"></h2>
+          <p id="modalAuthor" class="modal-author"></p>
+          <div class="modal-actions">
+            <button id="modalRead" class="btn btn-light" type="button" onclick="transitionToPage(`${activeBook.id}.html`)"><span>▶</span> Read book</button>
+            <button id="modalSave" class="btn btn-muted" type="button">＋ My List</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-details">
+        <div class="modal-description-wrap"><p id="modalDescription"></p><p class="source-note">Full text provided by Project Gutenberg when available.</p></div>
+        <aside class="book-facts"><p><span>GENRE</span><strong id="modalFactGenre"></strong></p><p><span>AUTHOR</span><strong id="modalFactAuthor"></strong></p><a id="gutenbergLink" target="_blank" rel="noopener noreferrer">View source ↗</a></aside>
+      </div>
+    </section>
+  </div>
+
+  <div id="readerModal" class="reader-modal" role="dialog" aria-modal="true" aria-labelledby="readerTitle" hidden>
+    <div class="reader-topbar">
+      <button id="closeReader" class="icon-button" type="button" aria-label="Close reader">✕</button>
+      <div class="reader-heading"><span class="reader-brand">BOOKFLIX</span><span class="reader-divider">/</span><span id="readerTitle">Reading</span></div>
+      <div class="reader-tools">
+        <button id="fontDown" class="reader-tool" type="button" aria-label="Decrease font size">A−</button>
+        <button id="fontUp" class="reader-tool" type="button" aria-label="Increase font size">A+</button>
+        <a id="readerSource" class="reader-source" href="#" target="_blank" rel="noopener noreferrer">Source ↗</a>
+      </div>
+    </div>
+    <div class="reader-progress"><div id="readerProgressBar"></div></div>
+    <article class="reader-page">
+      <p class="reader-overline">THE BOOKFLIX READING ROOM</p>
+      <h1 id="readerBookTitle"></h1><p id="readerBookAuthor" class="reader-author"></p>
+      <div id="readerStatus" class="reader-status" aria-live="polite">Preparing your book…</div>
+      <pre id="readerText" class="reader-text"></pre>
+      <p class="reader-end-note">You have reached the end of the available text.</p>
+    </article>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
